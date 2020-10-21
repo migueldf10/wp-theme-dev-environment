@@ -1,0 +1,11 @@
+@import 'theme/normalize';
+// styles.scss
+.testing {
+    width: percentage(5/7);
+    background:red;
+    color: orange;
+  }
+
+  body{
+    background:gray!important;
+  }
