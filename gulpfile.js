@@ -38,12 +38,12 @@ function style() {
 
 
 function watch(){
-    browserSync.init({
-
-        server: {
-            baseDir: './'
-        }
-     });
+    //initialize browsersync
+    browserSync.init(paths.styles.dest, {
+        //browsersync with a php server
+        proxy: "http://localhost:8888",
+        notify: true
+    });
     // gulp.watch takes in the location of the files to watch for changes
     // and the name of the function we want to run on change
     gulp.watch(paths.styles.src, style)
