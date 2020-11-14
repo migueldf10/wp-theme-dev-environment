@@ -1,5 +1,5 @@
 var gulp = require("gulp")
-var less = require('gulp-less');
+var sass = require('gulp-sass');
 var sourcemaps = require("gulp-sourcemaps");
 var browserSync = require("browser-sync").create();
 var postcss = require("postcss")
@@ -38,7 +38,7 @@ function style() {
         gulp
             .src(paths.styles.src)
             .pipe(sourcemaps.init())
-            .pipe(less())
+            .pipe(sass())
             .on('error',console.log.bind(console))
             .pipe(postcss(plugins))
             .pipe(gulp.dest(paths.styles.dest))
@@ -60,15 +60,7 @@ function bundleJs(){
 }
 
 
-function bundleAjax(){
-    return (
-        gulp.src(paths.ajax.src)
-            .pipe(babel({
-                plugins: ['@babel/transform-runtime']
-            }))
-            .pipe(gulp.dest(paths.ajax.dest))
-    );
-}
+
 
 
 
@@ -87,7 +79,6 @@ function watch(){
     gulp.watch(paths.styles.watch, style)
     gulp.watch(paths.styles.outputFile).on('change', browserSync.reload);
     gulp.watch(paths.scripts.src, bundleJs)
-    gulp.watch(paths.ajax.src, bundleAjax)
     gulp.watch(paths.scripts.outputFile).on('change', browserSync.reload);
 
 
