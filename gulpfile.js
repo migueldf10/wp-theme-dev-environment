@@ -1,34 +1,46 @@
-var gulp = require("gulp"),
-    sass = require("gulp-sass"),
-    // postcss = require("gulp-postcss"),
-    autoprefixer = require("autoprefixer"),
-    cssnano = require("cssnano"),
-    sourcemaps = require("gulp-sourcemaps");
-
+var gulp = require("gulp")
+var less = require('gulp-less');
+var sourcemaps = require("gulp-sourcemaps");
 var browserSync = require("browser-sync").create();
-const sitename = 'gulp'; // set your siteName here
-
+var postcss = require("postcss")
+var cssnano = require("cssnano")
+var autoprefixer = require("autoprefixer")
+var postcss = require('gulp-postcss');
+var concat = require('gulp-concat');
+const babel = require('gulp-babel');
 	
 var paths = {
     styles: {
-        src: "scss/**/*.scss",
-        dest: "app/css"
+        src:"scss/theme.scss",
+        watch: "scss/**/*.scss",
+        dest: "dist",
+        outputFile : "theme.css"
+
+    },
+    scripts: {
+        src: "js/theme/**/*.js",
+        dest: "dist",
+        outputFile : "theme.js"
     }
 };
 
+var plugins = [
+    autoprefixer(),
+    cssnano({preset: ['default', {
+        discardComments: {
+            removeAll: false,
+        },
+    }]})
+];
 
 function style() {
     return (
         gulp
             .src(paths.styles.src)
-            // Initialize sourcemaps before compilation starts
             .pipe(sourcemaps.init())
-            .pipe(sass())
-            .on("error", sass.logError)
-            // Use postcss with autoprefixer and compress the compiled file using cssnano
-            // .pipe(postcss([autoprefixer(), cssnano()]))
-            // Now add/write the sourcemaps
-            .pipe(sourcemaps.write())
+            .pipe(less())
+            .on('error',console.log.bind(console))
+            .pipe(postcss(plugins))
             .pipe(gulp.dest(paths.styles.dest))
             .pipe(browserSync.stream())
 
@@ -36,18 +48,47 @@ function style() {
 }
 
 
+function bundleJs(){
+    return (
+        gulp.src(paths.scripts.src)
+            .pipe(concat(paths.scripts.outputFile))
+            .pipe(babel({
+                plugins: ['@babel/transform-runtime']
+            }))
+            .pipe(gulp.dest(paths.scripts.dest))
+    );
+}
+
+
+function bundleAjax(){
+    return (
+        gulp.src(paths.ajax.src)
+            .pipe(babel({
+                plugins: ['@babel/transform-runtime']
+            }))
+            .pipe(gulp.dest(paths.ajax.dest))
+    );
+}
+
+
+
+
 
 function watch(){
     //initialize browsersync
-    browserSync.init(paths.styles.dest, {
+    browserSync.init({
+        files: ["./*.php","dist"],
         //browsersync with a php server
-        proxy: "http://localhost:8888",
+        proxy: "http://localhost:8888/tdoa",
         notify: true
     });
     // gulp.watch takes in the location of the files to watch for changes
     // and the name of the function we want to run on change
-    gulp.watch(paths.styles.src, style)
-    gulp.watch(paths.styles.dest).on('change', browserSync.reload);
+    gulp.watch(paths.styles.watch, style)
+    gulp.watch(paths.styles.outputFile).on('change', browserSync.reload);
+    gulp.watch(paths.scripts.src, bundleJs)
+    gulp.watch(paths.ajax.src, bundleAjax)
+    gulp.watch(paths.scripts.outputFile).on('change', browserSync.reload);
 
 
 }
@@ -55,5 +96,6 @@ function watch(){
 
 exports.style = style;
 exports.watch = watch
+exports.bundleJs = bundleJs
 
 
