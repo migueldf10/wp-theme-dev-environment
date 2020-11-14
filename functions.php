@@ -4,7 +4,7 @@
         wp_enqueue_style( 'parent-style', get_template_directory_uri().'/style.css' );
     }
     function mytheme_files() { 
-        wp_enqueue_style('mytheme_main_style', get_theme_file_uri('app/css/styles.css')); 
+        wp_enqueue_style('mytheme_main_style', get_theme_file_uri('dis/theme.css')); 
     } 
     add_action('wp_enqueue_scripts', 'mytheme_files');
 ?>
